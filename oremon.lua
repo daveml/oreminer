@@ -49,6 +49,12 @@ while true do
     event, param1, param2 = os.pullEvent()
 
 	if event == "rednet_message" then
+		
+		if string.find(param2, "CARTSCAN:") then
+			print("cartScan msg received!")
+			print(param2)
+			monitor.write(param2)
+		end
 	end		
 
     
