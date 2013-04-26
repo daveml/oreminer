@@ -70,15 +70,21 @@ end
 
 function Init()	
 	resetCart()
+	menuShow()
 end
 
-while true do
+function menuShow()
 	print("")
 	print("1 - Run Output Test")
 	print("2 - Check Inputs Test")
 	print("3 - Scan Cart")
 	print("4 - Print Cart")
 	print("5 - Reset Cart")
+end
+
+
+Init()
+while true do
 	
     event, param1, param2 = os.pullEvent()
     
@@ -101,6 +107,7 @@ while true do
 		if param1 == "e" then
 		    break
 		end
+		menuShow()
 	end
 	if event == "redstone" then
 		input = redstone.getBundledInput(__rsbSideIn)
