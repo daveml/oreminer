@@ -1,4 +1,0 @@
-oreminer
-========
-
-Minecraft Ore Miner
