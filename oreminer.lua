@@ -27,3 +27,8 @@ while num1 ~= 0 do
    num1 = tonumber(read())
    print("Press a key, 0 to exit")
 end
+
+function colorTest(code, color)
+	print(code, ":", color)
+	return true
+end
