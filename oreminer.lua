@@ -42,13 +42,13 @@ while true do
     
     print(event, pram1, param2)
 	
-	if param2 == "1" then
+	if param1 == "1" then
 	    checkOutputs()
 	end
-	if param2 == "2" then
+	if param1 == "2" then
 	    checkInputs()
 	end
-	if param2 == "e" then
+	if param1 == "e" then
 	    break
 	end
 end
