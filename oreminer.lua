@@ -18,8 +18,8 @@ sensorCargoFull = {0,1}
 sensorCargoEmpty = {0,1}
 sensorHasRails = {0,1}
 
-Cart = { [sensorCartType]="cartType", [sensorCargoFull]="cargoFull", [sensorCargoEmpty]="cargoEmpty", [sensorHasRails]="hasRails" }
-
+-- Cart = { [sensorCartType]="cartType", [sensorCargoFull]="cargoFull", [sensorCargoEmpty]="cargoEmpty", [sensorHasRails]="hasRails" }
+-- Cart = { "", 0, 0, 0, 0}
 
 __rsbSideIn = "left"
 __rsbSideOut = "right"
@@ -49,14 +49,14 @@ function checkInputs()
 end
 
 function readCart()
-	Cart.cartType = miner
+	Cart.cartType = "miner"
 	Cart.cargoFull = 1
 	Cart.cargoEmpty = 1
 	Cart.HasRails = 1
 end
 
 function resetCart()
-	Cart.cartType = derailer
+	Cart.cartType = "derailer"
 	Cart.cargoFull = 0
 	Cart.cargoEmpty = 0
 	Cart.HasRails = 0
@@ -73,8 +73,6 @@ while true do
 	
     event, param1, param2 = os.pullEvent()
     
-    print(event, pram1, param2)
-	
 	if param1 == "1" then
 	    checkOutputs()
 	end
