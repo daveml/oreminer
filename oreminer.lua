@@ -18,7 +18,7 @@ sensorCargoFull = {0,1}
 sensorCargoEmpty = {0,1}
 sensorHasRails = {0,1}
 
--- Cart = { [sensorCartType]="cartType", [sensorCargoFull]="cargoFull", [sensorCargoEmpty]="cargoEmpty", [sensorHasRails]="hasRails" }
+Cart = { [sensorCartType]="cartType", [sensorCargoFull]="cargoFull", [sensorCargoEmpty]="cargoEmpty", [sensorHasRails]="hasRails" }
 -- Cart = { "", 0, 0, 0, 0}
 
 __rsbSideIn = "left"
