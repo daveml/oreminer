@@ -152,7 +152,9 @@ while true do
 			print("Cart scan complete!\n")
 			cartShow()
 			print("")
-			print("CARTSCAN:",Cart.cartType,":",Cart.cargoEmpty,":",Cart.cargoFull,":",Cart.hasRails,":",Cart.hasTorches,":",Cart.hasBridge,"::")
+			monCmd = "CARTSCAN:"..Cart.cartType..":"..Cart.cargoEmpty..":"..Cart.cargoFull..":"..Cart.hasRails..":"..Cart.hasTorches..":"..Cart.hasBridge.."::"
+			print(monCmd)
+			redndet.send(29,monCmd)
 		end
 	end	
 end
