@@ -3,9 +3,12 @@
 and so is this
 ]]--
 
-
+function colorTest(code, color)
+	print(code, ":", color)
+	return true
+end
 -- op = read() -- this code creates a variable called 'op', the read() function stalls the program to accept user input, which is stored in op
-print("OreMiner") -- just gives us some space to work with
+print("OreMiner") -- jusdt gives us some space to work with
 
 for k,v in pairs(redstone.getSides()) do
  print(k,v)
@@ -17,7 +20,7 @@ colors = {white=1,orange=2,magenta=4,lightblue=8,yellow=16,lime=32,pink=64,gray=
 while num1 ~= 0 do
 	test = redstone.getBundledInput("left")
 	for color,code in pairs(colors) do
-		if colors.test(test, code) then
+		if colorTest(test, code) then
 			print(color," is ON")
 		end	
 --		print(color, code)
@@ -28,7 +31,3 @@ while num1 ~= 0 do
    print("Press a key, 0 to exit")
 end
 
-function colorTest(code, color)
-	print(code, ":", color)
-	return true
-end
