@@ -14,8 +14,8 @@ colors = {white=1,orange=2,magenta=4,lightblue=8,yellow=16,lime=32,pink=64,gray=
 
 function checkOutputs()
 	for color,code in pairs(colors) do
-		redstone.setBundledOutput("right", -1)
-		sleep(.5)
+		redstone.setBundledOutput("right", 65535)
+		sleep(2)
 		redstone.setBundledOutput("right", 0)
 	end
 end
@@ -29,11 +29,13 @@ function checkInputs()
 	end	
 end
 
-clear()
 while true do
+	print("")
 	print("1 - Run Output Test")
 	print("2 - Check Inputs Test")
     event, param1, param2 = os.pullEvent()
+    
+    print(event, pram1, param2)
 	
 	if param2 == "1" then
 	    checkOutputs()
