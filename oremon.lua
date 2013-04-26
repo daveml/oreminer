@@ -43,11 +43,9 @@ local setCartStatus = {
 	{23,8,"        "}}
 
 function screenDraw(blob)
-	monitor.clear()
-
-	for i in blob do
-		monitor.setCursorPos(blob[1],blob[2])
-		monitor.write(blob[3])
+	for k,v in pairs(blob) do
+		monitor.setCursorPos(v[1],v[2])
+		monitor.write(v[3])
 	end
 end
 	
