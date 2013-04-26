@@ -85,6 +85,9 @@ while true do
 	if param1 == "4" then
 		for k,v in pairs(Cart) do print(k," - ",v) end
 	end
+	if param1 == "5" then
+	    resetCart()
+	end
 	if param1 == "e" then
 	    break
 	end
