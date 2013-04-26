@@ -10,21 +10,24 @@ end
 print("OreMiner") -- jusdt gives us some space to work with
 
 colors = {white=1,orange=2,magenta=4,lightblue=8,yellow=16,lime=32,pink=64,gray=128,lightgray=256,cyan=512,purple=1024,blue=2048,brown=4096,green=8192,red=16384, black=32768}
+__rsbSideIn = "left"
+__rsbSideOut = "right"
 -- test = redstone.getBundledInput("left")
 
 function checkOutputs()
 	print("Running Output loop test")
 	for color,code in pairs(colors) do
-		redstone.setBundledOutput("right", 65535)
+		redstone.setBundledOutput(__rsbSideOut, 65535)
 		sleep(2)
-		redstone.setBundledOutput("right", 0)
+		redstone.setBundledOutput(__rsbSideOut, 0)
+		redstone.setBundledOutput(__rsbSideOut, 0)
 	end
 	print("End output test")
 end
 
 function checkInputs()
 	print("Running Input check")
-	test = redstone.getBundledInput("left")
+	test = redstone.getBundledInput(__rsbSideIn)
 	print("code=", test)
 	for color,code in pairs(colors) do
 		if colorTest(test, code) then
