@@ -99,7 +99,7 @@ while true do
 	if event == "redstone" then
 		input = redstone.getBundledInput(__rsbSideIn)
 		
-		if colorTest(input, rsbInput.arrival) then
+		if colorTest(input, rsbInputs.arrival) then
 			print("Cart Arrival!")
 			resetCart()
 		end
