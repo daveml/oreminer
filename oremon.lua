@@ -1,4 +1,4 @@
-__sideRn = "right"
+__sideRn = "left"
 __sideMon = "back"
 __myId = os.computerID()
 
@@ -6,7 +6,7 @@ local w, h
 local wm, hm, monitor
 
 function Init()
-	rednet.open(__SsideRn)
+	rednet.open(__sideRn)
 	print("MyId => ",__myID)
 	monitor = peripheral.wrap(__sideMon)
 	wm, hm = monitor.getSize()
