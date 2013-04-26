@@ -13,20 +13,25 @@ colors = {white=1,orange=2,magenta=4,lightblue=8,yellow=16,lime=32,pink=64,gray=
 -- test = redstone.getBundledInput("left")
 
 function checkOutputs()
+	print("Running Output loop test")
 	for color,code in pairs(colors) do
 		redstone.setBundledOutput("right", 65535)
 		sleep(2)
 		redstone.setBundledOutput("right", 0)
 	end
+	print("End output test")
 end
 
 function checkInputs()
+	print("Running Input check")
 	test = redstone.getBundledInput("left")
+	print("code=", test)
 	for color,code in pairs(colors) do
 		if colorTest(test, code) then
 			print(color," is ON")
 		end	
 	end	
+	print("End inpout test")
 end
 
 while true do
