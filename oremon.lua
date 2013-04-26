@@ -70,9 +70,14 @@ while true do
 			print(param2)
 			local stat = setCartStatus
 			monitor.write(param2)
+			i=1
 			for v in string.gmatch(param2, ":(%w+)") do
    				print(v)
+   				stat[i][3] = v
+   				i=i+1
 			end
+			screenDraw(CartStatus)
+			screenDraw(stat)
 		end
 	end		
 
