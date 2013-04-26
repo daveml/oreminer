@@ -9,8 +9,9 @@ function Init()
 	monitor = peripheral.wrap(__sideMon)
 	wm, hm = monitor.getSize()
 	monitor.setTextScale(1)
-	monitor.clear()
 	print("MyId => ", os.computerID())
+	monitor.clear()
+	monitor.setCursorPos(1,1)
 	monitor.write("MyId => ", os.computerID())
 end
 
