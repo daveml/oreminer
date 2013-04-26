@@ -11,8 +11,8 @@ print("OreMiner") -- jusdt gives us some space to work with
 
 __rsbSideIn = "left"
 __rsbSideOut = "right"
-__miner = "miner"
-__derailer = __derailer
+__miner = "Miner"
+__derailer = "Derailer"
 
 colors = {white=1,orange=2,magenta=4,lightblue=8,yellow=16,lime=32,pink=64,gray=128,lightgray=256,cyan=512,purple=1024,blue=2048,brown=4096,green=8192,red=16384, black=32768}
 rsbInputs = {read_done=1,sys_test=2,sys_on=4,s5_torches=8,s3_cargo2=16,lime=32,s6_bridge=64,gray=128,lightgray=256,cyan=512,departure=1024,s2_cargo1=2048,s4_rails=4096,arrival=8192,s1_carttype=16384, black=32768}
