@@ -16,7 +16,7 @@ function Init()
 end
 
 local CartStatus = {
-	{1,1,"       Cart Scan Status"},
+	{1,1,"       Cart Scan Status"},s
 	{1,2,"-----------------------------"},
 	{1,3,"        Cart Type => "},
 	{1,4,"     Cargo Empty? => "},
@@ -34,6 +34,14 @@ local clrCartStatus = {
 	{23,7,"        "},
 	{23,8,"        "}}
 	
+local setCartStatus = {
+	{23,3,"        "},
+	{23,4,"        "},
+	{23,5,"        "},
+	{23,6,"        "},
+	{23,7,"        "},
+	{23,8,"        "}}
+
 function screenDraw(blob)
 	monitor.clear()
 
@@ -60,7 +68,12 @@ while true do
 		if string.find(param2, "CARTSCAN:") then
 			print("cartScan msg received!")
 			print(param2)
+			local stat = setCartStatus
 			monitor.write(param2)
+			for k, v in string.gmatch(s, "(%w+)=(%w+)") do
+   				t[k] = v
+   				print(v)
+			end
 		end
 	end		
 
