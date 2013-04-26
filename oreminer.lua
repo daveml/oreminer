@@ -4,12 +4,7 @@ and so is this
 ]]--
 
 function colorTest(code, color)
-	resp = (code % (color*2)) > (color-1)
-	if resp > 0 then
-		return true
-	else
-		return false
-	end
+	return ((code % (color*2)) > (color-1))
 end
 -- op = read() -- this code creates a variable called 'op', the read() function stalls the program to accept user input, which is stored in op
 print("OreMiner") -- jusdt gives us some space to work with
