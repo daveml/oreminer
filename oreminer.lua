@@ -20,7 +20,7 @@ function checkOutputs()
 		redstone.setBundledOutput(__rsbSideOut, 65535)
 		sleep(2)
 		redstone.setBundledOutput(__rsbSideOut, 0)
-		redstone.setBundledOutput(__rsbSideOut, 0)
+		sleep(2)
 	end
 	print("End output test")
 end
