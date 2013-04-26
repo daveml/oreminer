@@ -3,10 +3,6 @@
 and so is this
 ]]--
 
-function os.pullEvent()
- print("sadasf")
-end
-
 function colorTest(code, color)
 	return ((code % (color*2)) > (color-1))
 end
