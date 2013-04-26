@@ -16,7 +16,7 @@ function Init()
 end
 
 local CartStatus = {
-	{1,1,"       Cart Scan Status"},s
+	{1,1,"       Cart Scan Status"},
 	{1,2,"-----------------------------"},
 	{1,3,"        Cart Type => "},
 	{1,4,"     Cargo Empty? => "},
