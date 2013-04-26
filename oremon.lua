@@ -1,17 +1,18 @@
 local __sideRn = "left"
 local __sideMon = "back"
-local __myId = os.getComputerID()
+__myId = os.getComputerID()
 
 local w, h 
 local wm, hm, monitor
 
 function Init()
 	rednet.open(__sideRn)
-	print("MyId => ",__myID)
 	monitor = peripheral.wrap(__sideMon)
 	wm, hm = monitor.getSize()
 	monitor.setTextScale(1)
 	monitor.clear()
+	print("MyId => ",__myID)
+	monitor.write("MyId => ",__myID)
 end
 
 local CartStatus = {
@@ -47,6 +48,12 @@ Init()
 while true do
 	
     event, param1, param2 = os.pullEvent()
+
+	if event == "char" then
+		if param1 == "e" then
+		    break
+		end
+	end
 
 	if event == "rednet_message" then
 		
