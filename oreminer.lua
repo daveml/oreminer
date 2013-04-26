@@ -61,7 +61,10 @@ function resetCart()
 	Cart.cargoEmpty = 0
 	Cart.hasRails = 0
 end
-	
+
+function Init()	
+	resetCart()
+end
 
 while true do
 	print("")
@@ -73,23 +76,33 @@ while true do
 	
     event, param1, param2 = os.pullEvent()
     
-	if param1 == "1" then
-	    checkOutputs()
+	if event == "char" then
+		if param1 == "1" then
+		    checkOutputs()
+		end
+		if param1 == "2" then
+		    checkInputs()
+		end
+		if param1 == "3" then
+		    readCart()
+		end
+		if param1 == "4" then
+			for k,v in pairs(Cart) do print(k," - ",v) end
+		end
+		if param1 == "5" then
+		    resetCart()
+		end
+		if param1 == "e" then
+		    break
+		end
 	end
-	if param1 == "2" then
-	    checkInputs()
-	end
-	if param1 == "3" then
-	    readCart()
-	end
-	if param1 == "4" then
-		for k,v in pairs(Cart) do print(k," - ",v) end
-	end
-	if param1 == "5" then
-	    resetCart()
-	end
-	if param1 == "e" then
-	    break
-	end
+	if event == "redstone" then
+		input = redstone.getBundledInput(__rsbSideIn)
+		
+		if colorTest(input, rsbInput.arrival) then
+			print("Cart Arrival!")
+			resetCart()
+		end
+	end	
 end
 
