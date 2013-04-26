@@ -9,9 +9,10 @@ print("OreMiner") -- just gives us some space to work with
 
 num1 = 1;
 colors = {white=1,orange=2,magenta=4,lightblue=8,yellow=16,lime=32,pink=64,gray=128,lightgray=256,cyan=512,purple=1024,blue=2048,brown=4096,green=8192,red=16384, black=32768}
-
+print (colors.test (redstone.getBundledInput("back"), colors.blue))
 while num1 ~= 0 do
 	for color,code in pairs(colors) do
+		print(color, code)
 		print(color, (colors.test (redstone.getBundledInput("left"), code)))
 	end	
    num1 = tonumber(read())
