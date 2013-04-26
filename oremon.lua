@@ -1,6 +1,5 @@
 local __sideRn = "left"
 local __sideMon = "back"
-__myId = os.computerID()
 
 local w, h 
 local wm, hm, monitor
@@ -11,8 +10,8 @@ function Init()
 	wm, hm = monitor.getSize()
 	monitor.setTextScale(1)
 	monitor.clear()
-	print("MyId => ",__myID)
-	monitor.write("MyId => ",__myID)
+	print("MyId => ", os.computerID())
+	monitor.write("MyId => ", os.computerID())
 end
 
 local CartStatus = {
