@@ -151,6 +151,8 @@ while true do
 		if colorTest(input, rsbInputs.read_done) then
 			print("Cart scan complete!\n")
 			cartShow()
+			print("")
+			print("CARTSCAN:",Cart.cartType,":",Cart.cargoEmpty,":",Cart.cargoFull,":",Cart.hasRails,":",Cart.hasTorches,":",Cart.hasBridge,"::")
 		end
 	end	
 end
