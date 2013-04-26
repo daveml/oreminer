@@ -87,8 +87,8 @@ function cartShow()
 	print("          Cart Status")
 	print("-----------------------------")
 	print("        Cart Type => ", Cart.cartType)
-	print("     Cargo Empty? => ", Cart.cartEmpty)
-	print("      Cargo Full? => ", Cart.cartFull)
+	print("     Cargo Empty? => ", Cart.cargoEmpty)
+	print("      Cargo Full? => ", Cart.cargoFull)
 	print("Railer has rails? => ", Cart.hasRails)
 	print("     Has Torches? => ", Cart.hasTorches)
 	print("Bridge Materials? => ", Cart.hasBridge)
@@ -134,10 +134,10 @@ while true do
 			Cart.cartType = __miner
 		end
 		if colorTest(input, rsbInputs.s2_cargo1) then
-			Cart.cartEmpty = true
+			Cart.cargoEmpty = true
 		end
 		if colorTest(input, rsbInputs.s3_cargo2) then
-			Cart.cartFull = true
+			Cart.cargoFull = true
 		end
 		if colorTest(input, rsbInputs.s4_rails) then
 			Cart.hasRails = true
