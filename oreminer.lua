@@ -17,8 +17,7 @@ colors = {white=1,orange=2,magenta=4,lightblue=8,yellow=16,lime=32,pink=64,gray=
 while num1 ~= 0 do
 	test = redstone.getBundledInput("left")
 	for color,code in pairs(colors) do
-		check = test and code
-		if check == code then
+		if colors.test(test, code) then
 			print(color," is ON")
 		end	
 --		print(color, code)
