@@ -156,7 +156,7 @@ while true do
 			print("")
 			monCmd = "CARTSCAN:"..Cart.cartType..":"..Cart.cargoEmpty..":"..Cart.cargoFull..":"..Cart.hasRails..":"..Cart.hasTorches..":"..Cart.hasBridge.."::"
 			print(monCmd)
-			redndet.broadcast(monCmd)
+			rednet.broadcast(monCmd)
 		end
 	end	
 end
