@@ -16,7 +16,7 @@ function Init()
 end
 
 local CartStatus = {
-	{1,1,"       Cart Scan Status"},
+	{1,1,"    Last Cart Scan Status"},
 	{1,2,"-----------------------------"},
 	{1,3,"        Cart Type => "},
 	{1,4,"     Cargo Empty? => "},
@@ -67,7 +67,6 @@ while true do
 			print("cartScan msg received!")
 			print(param2)
 			local stat = setCartStatus
-			monitor.write(param2)
 			i=1
 			for v in string.gmatch(param2, ":(%w+)") do
    				print(v)
@@ -79,5 +78,5 @@ while true do
 		end
 	end		
 
-    
+
 end
