@@ -120,6 +120,11 @@ while true do
 		if param1 == "5" then
 		    resetCart()
 		end
+		if param1 == "t" then
+			monCmd = "CARTSCAN:"..Cart.cartType..":"..Cart.cargoEmpty..":"..Cart.cargoFull..":"..Cart.hasRails..":"..Cart.hasTorches..":"..Cart.hasBridge.."::"
+			print(monCmd)
+			rednet.broadcast(monCmd)
+		end
 		if param1 == "e" then
 		    break
 		end

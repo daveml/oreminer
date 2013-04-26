@@ -70,7 +70,7 @@ while true do
 			print(param2)
 			local stat = setCartStatus
 			monitor.write(param2)
-			for k, v in string.gmatch(s, "(%w+)=(%w+)") do
+			for k, v in string.gmatch(param2, "(%w+)=(%w+)") do
    				t[k] = v
    				print(v)
 			end
