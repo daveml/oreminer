@@ -136,8 +136,21 @@ while true do
 		end
 		if colorTest(input, rsbInputs.read_done) then
 			print("Cart scan complete!\n")
-			for k,v in pairs(Cart) do print(k," - ",v) end
+			cartShow()
 		end
 	end	
+end
+
+function cartShow()
+	print("          Cart Status")
+	print("-----------------------------")
+	print("        Cart Type => ", Cart.cartType)
+	print("     Cargo Empty? => ", Cart.cartEmpty)
+	print("      Cargo Full? => ", Cart.cartFull)
+	print("Railer has rails? => ", Cart.hasRails)
+	print("     Has Torches? => ", Cart.hasTorches)
+	print("Bridge Materials? => ", Cart.hasBridge)
+	print("-----------------------------")
+
 end
 
