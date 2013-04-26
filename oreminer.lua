@@ -9,21 +9,23 @@ end
 -- op = read() -- this code creates a variable called 'op', the read() function stalls the program to accept user input, which is stored in op
 print("OreMiner") -- jusdt gives us some space to work with
 
-colors = {white=1,orange=2,magenta=4,lightblue=8,yellow=16,lime=32,pink=64,gray=128,lightgray=256,cyan=512,purple=1024,blue=2048,brown=4096,green=8192,red=16384, black=32768}
-rsbInputs = {read_done=1,sys_test=2,sys_on=4,s5_supplies=8,s3_cargo2=16,lime=32,pink=64,gray=128,lightgray=256,cyan=512,departure=1024,s2_cargo1=2048,s4_rails=4096,arrival=8192,s1_carttype=16384, black=32768}
-rsbOutputs = {rs_general=1,send_derailer=2,sys_test=4,unload=8,sw_cartpark=16,lime=32,sys_fault=64,gray=128,lightgray=256,rs_fuel=512,send_miner=1024,rs_rails=2048,sensor_reset=4096,sys_running=8192,sw_mine=16384, sys_stop=32768}
-
-sensorCartType = {"miner","derailer"}
-sensorCargoFull = {0,1}
-sensorCargoEmpty = {0,1}
-sensorHasRails = {0,1}
-
-Cart = { [sensorCartType]="cartType", [sensorCargoFull]="cargoFull", [sensorCargoEmpty]="cargoEmpty", [sensorHasRails]="hasRails" }
--- Cart = { "", 0, 0, 0, 0}
-
 __rsbSideIn = "left"
 __rsbSideOut = "right"
--- test = redstone.getBundledInput("left")
+__miner = "miner"
+__derailer = __derailer
+
+colors = {white=1,orange=2,magenta=4,lightblue=8,yellow=16,lime=32,pink=64,gray=128,lightgray=256,cyan=512,purple=1024,blue=2048,brown=4096,green=8192,red=16384, black=32768}
+rsbInputs = {read_done=1,sys_test=2,sys_on=4,s5_torches=8,s3_cargo2=16,lime=32,s6_bridge=64,gray=128,lightgray=256,cyan=512,departure=1024,s2_cargo1=2048,s4_rails=4096,arrival=8192,s1_carttype=16384, black=32768}
+rsbOutputs = {rs_general=1,send_derailer=2,sys_test=4,unload=8,sw_cartpark=16,lime=32,sys_fault=64,gray=128,lightgray=256,rs_fuel=512,send_miner=1024,rs_rails=2048,sensor_reset=4096,sys_running=8192,sw_mine=16384, sys_stop=32768}
+
+sensorCartType = {__miner,__derailer}
+sensorCargoFull = {false,true}
+sensorCargoEmpty = {false, true}
+sensorHasRails = {false,true}
+sensorHasTorches = {false,true}
+sensorHasBridge = {false,true}
+
+Cart = { [sensorCartType]="cartType", [sensorCargoFull]="cargoFull", [sensorCargoEmpty]="cargoEmpty", [sensorHasRails]="hasRails", [sensorHasTorches]="hasTorches", [sensorHasBridge]="hasBridge" }
 
 function checkOutputs()
 	print("Running Output loop test")
@@ -49,17 +51,21 @@ function checkInputs()
 end
 
 function readCart()
-	Cart.cartType = "miner"
-	Cart.cargoFull = 1
-	Cart.cargoEmpty = 1
-	Cart.hasRails = 1
+	Cart.cartType = __miner
+	Cart.cargoFull = true
+	Cart.cargoEmpty = true
+	Cart.hasRails = true
+	Cart.hasTorches = true
+	Cart.hasBridge = true
 end
 
 function resetCart()
-	Cart.cartType = "derailer"
-	Cart.cargoFull = 0
-	Cart.cargoEmpty = 0
-	Cart.hasRails = 0
+	Cart.cartType = __derailer
+	Cart.cargoFull = false
+	Cart.cargoEmpty = false
+	Cart.hasRails = false
+	Cart.hasTorches = false
+	Cart.hasBridge = false
 end
 
 function Init()	
@@ -102,6 +108,28 @@ while true do
 		if colorTest(input, rsbInputs.arrival) then
 			print("Cart Arrival!")
 			resetCart()
+		end
+		if colorTest(input, rsbInputs.s1_carttype) then
+			Cart.cartType = __miner
+		end
+		if colorTest(input, rsbInputs.s2_cargo1) then
+			Cart.cartEmpty = true
+		end
+		if colorTest(input, rsbInputs.s3_cargo2) then
+			Cart.cartFull = true
+		end
+		if colorTest(input, rsbInputs.s4_rails) then
+			Cart.hasRails = true
+		end
+		if colorTest(input, rsbInputs.s5_torches) then
+			Cart.hasTorches = true
+		end
+		if colorTest(input, rsbInputs.s6_bridge) then
+			Cart.hasBridge = true
+		end
+		if colorTest(input, rsbInputs.read_done) then
+			print("Cart scan complete!\n")
+			for k,v in pairs(Cart) do print(k," - ",v) end
 		end
 	end	
 end
