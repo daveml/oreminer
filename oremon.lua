@@ -1,6 +1,6 @@
-__sideRn = "left"
-__sideMon = "back"
-__myId = os.computerID()
+local __sideRn = "left"
+local __sideMon = "back"
+local __myId = os.getComputerID()
 
 local w, h 
 local wm, hm, monitor
