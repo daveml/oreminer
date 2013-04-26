@@ -15,10 +15,14 @@ num1 = 1;
 colors = {white=1,orange=2,magenta=4,lightblue=8,yellow=16,lime=32,pink=64,gray=128,lightgray=256,cyan=512,purple=1024,blue=2048,brown=4096,green=8192,red=16384, black=32768}
 -- test = redstone.getBundledInput("left")
 while num1 ~= 0 do
+	test = redstone.getBundledInput("left")
 	for color,code in pairs(colors) do
-		print(color, code)
-		test = redstone.getBundledInput("left")
-		print(test)
+		check = test and code
+		if check == code then
+			print(color," is ON")
+		end	
+--		print(color, code)
+--      print(test)
 --		print(color, (colors.test (redstone.getBundledInput("left"), code)))
 	end	
    num1 = tonumber(read())
