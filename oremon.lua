@@ -73,6 +73,7 @@ while true do
    				stat[i][3] = v
    				i=i+1
 			end
+			screenDraw(clrCartStatus)
 			screenDraw(CartStatus)
 			screenDraw(stat)
 		end
