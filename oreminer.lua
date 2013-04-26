@@ -52,14 +52,14 @@ function readCart()
 	Cart.cartType = "miner"
 	Cart.cargoFull = 1
 	Cart.cargoEmpty = 1
-	Cart.HasRails = 1
+	Cart.hasRails = 1
 end
 
 function resetCart()
 	Cart.cartType = "derailer"
 	Cart.cargoFull = 0
 	Cart.cargoEmpty = 0
-	Cart.HasRails = 0
+	Cart.hasRails = 0
 end
 	
 
