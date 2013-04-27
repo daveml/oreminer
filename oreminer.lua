@@ -201,7 +201,7 @@ while true do
 	if event == "timer" then
 		os.startTimer(1)
 		if colorTest(input, rsbInputs.sys_on) then
-			rsbOutputToggle(rsbOutput.sys_running)
+			rsbOutputToggle(rsbOutputs.sys_running)
 		end
 	end
 end
