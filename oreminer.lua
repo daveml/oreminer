@@ -174,7 +174,7 @@ while true do
 			local newOutput
 			curOutput = redstone.getBundledOutput(__rsbSideOut)
 			running = bit.band(curOutput, rsbInputs.sys_on)
-			if runnine == 0 then
+			if running == 0 then
 				newOutput = bit.bor(curOutput, rsbInputs.sys_on)
 			else
 				local mask = bit.bnot(rsbInputs.sys_on)
