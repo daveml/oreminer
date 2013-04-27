@@ -171,14 +171,14 @@ while true do
 		os.startTimer(1)
 		input = redstone.getBundledInput(__rsbSideIn)
 		if colorTest(input, rsbInputs.sys_on) then
-		
+			local newOutput
 			curOutput = redstone.getBundledOutput(__rsbSideOut)
 			running = bit.band(curOutput, rsbInputs.sys_on)
 			if runnine == 0 then
-				local newOutput = bit.bor(curOutput, rsbInputs.sys_on)
+				newOutput = bit.bor(curOutput, rsbInputs.sys_on)
 			else
 				local mask = bit.bnot(rsbInputs.sys_on)
-				local newOutput = bit.band(curOutput, mask)
+				newOutput = bit.band(curOutput, mask)
 			end			
 			print(newOutput)
 			redstone.setBundledOutput(__rsbSideOut, newOutput)
