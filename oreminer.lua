@@ -164,4 +164,22 @@ while true do
 			rednet.broadcast(monCmd)
 		end
 	end	
+	
+	if event == timer then
+		os.startTimer(1)
+		input = redstone.getBundledInput(__rsbSideIn)
+		if colorTest(input, rsbInputs.sys_on) then
+		
+			curOutput = redstone.getBundledOutput(__rsbSideOut)
+			running = bit.band(curOutput, rsbInputs.sys_on)
+			if runnine == 0 then
+				local newOutput = bit.bor(curOutput, rsbInputs.sys_on)
+				redstone.setBundledOutput(__rsbSideOut, newOutput)
+			else
+				local mask = bit.bnot(rsbInputs.sys_on)
+				local newOutput = bit.band(curOutput, mask)
+			end			
+			redstone.setBundledOutput(__rsbSideOut, newOutput)
+		end
+	end
 end
