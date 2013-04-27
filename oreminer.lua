@@ -99,13 +99,46 @@ function cartShow()
 
 end
 
+function rsbSetOutput(val)
+	local curOutput = redstone.getBundledOutput(__rsbSideOut)
+	local newOutput = bit.band(curOutput, val)
+	redstone.setBundledOutput(__rsbSideOut, newOutput)
+end
+
+function rsbClrOutput(val)
+	local curOutput = redstone.getBundledOutput(__rsbSideOut)
+	local mask = bit.bnot(val)
+	local newOutput = bit.band(curOutput, mask)
+	redstone.setBundledOutput(__rsbSideOut, newOutput)
+end
+
+function rsbGetOutput(val)
+	local curOutput = redstone.getBundledOutput(__rsbSideOut)
+	local current = bit.band(curOutput, val)
+	return current
+end
+
+function rsbToggleOutput(val)
+	if rsbGetOutput(val) == 0 then
+		rsbSetOutput(val)
+	else
+		rsbClrOutput(val)
+	end
+end
+
+function processCart()
+	if(Cart.cartType == __miner) then
+		rsbSetOutput(rsbOutputs.sw_cartpark)
+	end		
+
+end
 
 Init()
 
 while true do
 
     event, param1, param2 = os.pullEvent()
---print(event, ":",param1, ":",param2)
+
 	if event == "char" then
 		if param1 == "1" then
 		    checkOutputs()
@@ -160,29 +193,15 @@ while true do
 		if colorTest(input, rsbInputs.read_done) then
 			print("Cart scan complete!\n")
 			cartShow()
-			print("")
-			monCmd = "CARTSCAN:"..Cart.cartType..":"..Cart.cargoEmpty..":"..Cart.cargoFull..":"..Cart.hasRails..":"..Cart.hasTorches..":"..Cart.hasBridge.."::"
-			print(monCmd)
 			rednet.broadcast(monCmd)
+			processCart()
 		end
 	end	
 	
 	if event == "timer" then
-	--print(".")
 		os.startTimer(1)
-		input = redstone.getBundledInput(__rsbSideIn)
 		if colorTest(input, rsbInputs.sys_on) then
-			local newOutput
-			curOutput = redstone.getBundledOutput(__rsbSideOut)
-			running = bit.band(curOutput, rsbInputs.sys_on)
-			if running == 0 then
-				newOutput = bit.bor(curOutput, rsbInputs.sys_on)
-			else
-				local mask = bit.bnot(rsbInputs.sys_on)
-				newOutput = bit.band(curOutput, mask)
-			end			
-			print(newOutput)
-			redstone.setBundledOutput(__rsbSideOut, newOutput)
+			rsbOutputToggle(rsbOutput.sys_running)
 		end
 	end
 end
