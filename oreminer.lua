@@ -105,7 +105,7 @@ Init()
 while true do
 
     event, param1, param2 = os.pullEvent()
-    
+print(event, ":",param1, ":",param2)
 	if event == "char" then
 		if param1 == "1" then
 		    checkOutputs()
