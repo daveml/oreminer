@@ -101,6 +101,7 @@ end
 
 Init()
 while true do
+	os.startTimer(1)
 	
     event, param1, param2 = os.pullEvent()
     
