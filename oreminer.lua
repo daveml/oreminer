@@ -73,6 +73,7 @@ end
 function Init()	
 	resetCart()
 	menuShow()
+	myTimer = os.startTimer(1)
 end
 
 function menuShow()
@@ -100,9 +101,9 @@ end
 
 
 Init()
+
 while true do
-	os.startTimer(1)
-	
+
     event, param1, param2 = os.pullEvent()
     
 	if event == "char" then
@@ -167,7 +168,7 @@ while true do
 	end	
 	
 	if event == "timer" then
-	print(".")
+	--print(".")
 		os.startTimer(1)
 		input = redstone.getBundledInput(__rsbSideIn)
 		if colorTest(input, rsbInputs.sys_on) then
