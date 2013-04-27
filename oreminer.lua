@@ -166,7 +166,7 @@ while true do
 		end
 	end	
 	
-	if event == timer then
+	if event == "timer" then
 	print(".")
 		os.startTimer(1)
 		input = redstone.getBundledInput(__rsbSideIn)
