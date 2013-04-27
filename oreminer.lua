@@ -100,13 +100,8 @@ function cartShow()
 end
 
 function rsbSetOutput(val)
-	local curOutput
-	local newOutput
-	
-	curOutput = redstone.getBundledOutput(__rsbSideOut)
-	print(curOutput)
-	newOutput = bit.band(curOutput, val)
-	print(newOutput)
+	local curOutput = redstone.getBundledOutput(__rsbSideOut)
+	local newOutput = bit.bor(curOutput, val)
 	redstone.setBundledOutput(__rsbSideOut, newOutput)
 end
 
