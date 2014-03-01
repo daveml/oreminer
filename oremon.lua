@@ -17,7 +17,7 @@ end
 
 local CartStatus = {
 	{1,1,"    Last Cart Scan Status"},
-	{1,2,"-----------------------------"},
+	{1,2,"-----------------------------"},event
 	{1,3,"        Cart Type => "},
 	{1,4,"     Cargo Empty? => "},
 	{1,5,"      Cargo Full? => "},
@@ -32,7 +32,7 @@ local clrCartStatus = {
 	{23,5,"        "},
 	{23,6,"        "},
 	{23,7,"        "},
-	{23,8,"        "}}
+	{23,8,"        "}}rednet
 	
 local setCartStatus = {
 	{23,3,"        "},
