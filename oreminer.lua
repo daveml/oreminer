@@ -10,37 +10,89 @@ function os.pullEvent()
 end
 ]]--
 
-if type(bit) == 'nil' then
+function _pullEvent()
+	return io.read()
+end
+
+function _queueEvent(Event)
+	print("TB QUEUE EVENT CALLED: ", Event)
+end
+
+
+if type(os.loadAPI) == 'nil' then
+
 	print("loading bit")
 	package.path = '..\\stateMgr\\?.lua;' .. package.path
 	require("numberlua")
 	bit = require 'numberlua'
-end
 
-if type(deferHdl) == 'nil' then
 	print("loading deferHdl")
 	package.path = '..\\stateMgr\\?.lua;' .. package.path
 	deferHandle = require 'deferHdl'
-end	
+	os.pullEvent = _pullEvent
+	os.queueEvent = _queueEvent
 
-local Event = {Timer="timer",Redstone="redstone", Char="char", Rednet="rednet_message", 
-				Push="push", Key="key", Timer="timer", Alarm="alarm", Terminate="terminate",
-				Disk="disk", Disk_eject="disk_eject", Peripheral="peripheral", 
-				Peripheral_detached="peripheral_detached", Check_Recovery="check_recovery"}
+	Rsb = require 'sysRsb'
+
+end
+
+
+--[[
+local _TB_RSB_INPUT_VAL = 0
+local _TB_RSB_OUTPUT_VAL = 0
+
+function _rsbGetBundledInput()
+	print("_TBLIB ENTER: RSBIN=",_TB_RSB_INPUT_VAL," INPUT NEW VAL: ")
+	_TB_RSB_INPUT_VAL = tonumber(io.read())
+	return _TB_RSB_INPUT_VAL
+end
+
+function _rsbGetOutputRaw(side)
+	print("_TBLIB ENTER: RSBOUT=",_TB_RSB_OUTPUT_VAL, "INPUT NEW VAL: ")
+	_TB_RSB_OUTPUT_VAL = tonumber(io.read())
+	return _TB_RSB_OUTPUT_VAL
+end
+
+function _rsbSetOutputRaw(side, val)
+	print("_TBLIB OUT: RSBOUTPUT= ", val)
+	_TB_RSB_OUTPUT_VAL = val
+	return 0
+end
+
+if type(redstone) == 'nil' then
+print("setting redstone api")
+	redstone = {}
+	redstone.getBundledInput = _rsbGetBundledInput
+	redstone.getBundledOutput = _rsbGetOutputRaw
+	redstone.setBundledOutput = _rsbSetOutputRaw
+end
+--]]
+
 
 local __miner = "Miner"
 local __derailer = "Derailer"
+local __util = "UtilCart"
 local __false = 0
 local __true = 1
+local sensorHasBridge = {__false,__true}
+local Event = {Timer="timer",Redstone="redstone", Char="char", Rednet="rednet_message",
+				Push="push", Key="key", Timer="timer", Alarm="alarm", Terminate="terminate",
+				Disk="disk", Disk_eject="disk_eject", Peripheral="peripheral",
+				Peripheral_detached="peripheral_detached", Check_Recovery="check_recovery"}
 
 -- Set the cart up as a integer dictionary to make it easier to pass over Rednet
-local sensorCartType = {__miner,__derailer}
+local sensorCartType = {__miner,__derailer, __util}
 local sensorCargoFull = {__false,__true}
 local sensorCargoEmpty = {__false, __true}
 local sensorHasRails = {__false,__true}
 local sensorHasTorches = {__false,__true}
-local sensorHasBridge = {__false,__true}
-local Cart = { [sensorCartType]="cartType", [sensorCargoFull]="cargoFull", [sensorCargoEmpty]="cargoEmpty", [sensorHasRails]="hasRails", [sensorHasTorches]="hasTorches", [sensorHasBridge]="hasBridge" }
+
+local sensorCartPos = {0,0,0}
+
+local Cart = {
+	[sensorCartType]="cartType", [sensorCargoFull]="cargoFull", [sensorCargoEmpty]="cargoEmpty",
+	[sensorHasRails]="hasRails", [sensorHasTorches]="hasTorches", [sensorHasBridge]="hasBridge",
+	[sensorCartPos]="lastPos" }
 
 local deferHandlers = {}
 
@@ -52,8 +104,8 @@ local colors = {side=nil,
 
 local rsbIn1 = {side="left",
 				m={read_done=1,sys_test=2,sys_on=4,s5_torches=8,
-		 		   s3_cargo2=16,lime=32, s6_bridge=64,gray=miner_park,
-		 	   	   lightgray=derailer_park,depart_stateok=512,departure=1024,s2_cargo1=2048,
+		 		   s3_cargo2=16,lime=32, s6_bridge=64,miner_park=128,
+		 	   	   derailer_park=256,depart_stateok=512,departure=1024,s2_cargo1=2048,
 		 	   	   s4_rails=4096,arrival=8192,s1_carttype=16384, downhill=32768}}
 
 local rsbOut1 = {side="right",
@@ -63,17 +115,17 @@ local rsbOut1 = {side="right",
 		           sensor_reset=4096,sys_running=8192,sw_mine=16384, sys_stop=32768}}
 
 function rsbGetInputRaw(side)
-	return redstone.getBundledInput(side)
+	return  Rsb.Ctx_getBundledInput(side)
 end
-	
+
 function rsbGetOutputRaw(side)
-	return redstone.getBundledOutput(side)
+	return Rsb.get()
 end
-	
+
 function rsbSetOutputRaw(side, val)
-	return redstone.setBundledOutput(side, val)
+	return Rsb.set(val)
 end
-	
+
 function rsbSetOutput(side, val)
 	local curOutput = rsbGetOutputRaw(side)
 	local newOutput = bit.bor(curOutput, val)
@@ -113,8 +165,8 @@ function QueueNewEvent(Event, p1, p2, p3, p4)
 	os.queueEvent(Event)
 end
 
-deferHandlers.UI = 
-			{name = "UI", 
+deferHandlers.UI =
+			{name = "UI",
 				handlerF = nil,
 				events={Event.Char},
 				masks={}
@@ -141,22 +193,22 @@ end
 
 
 -- checks inputs, puts system into idle
-deferHandlers.Init = 
-			{name = "Init", 
+deferHandlers.Init =
+			{name = "Init",
 				events={Event.Push, Event.Char},
 				masks={}
 			}
-			
+
 deferHandlers.Init.handlerF = function (dH, Handler, EventT)
 	deferHandle.clearevent(EventT)
-	rsbSetOutputRaw(rsbOut1.side, 0)
+	--rsbSetOutputRaw(rsbOut1.side, 0)
 
-	local rsbOutputs = rsbOutputsGetRaw(rsbOut1.side)
+	local rsbOutputs = rsbGetOutputRaw(rsbOut1.side)
 	if rsbOutputs ~= 0 then
 		print("ERROR-Unable to clear outputs! System cannot start")
 		return
 	end
-	
+
 	local rsbInputs = rsbGetInputRaw(rsbIn1.side)
 	if rsbInputs ~= 0 then
 		print("ERROR-Input active, please reset before system can start")
@@ -172,14 +224,14 @@ deferHandlers.Init.handlerF = function (dH, Handler, EventT)
 		deferHandle.remove(dH, Handler)
 		deferHandle.add(dH, deferHandlers.Idle)
 		deferHandle.add(dH, deferHandlers.UI)
-		QueNewEvent(Event.Push)
+		QueueNewEvent(Event.Push)
 	end
 end
 
 
 -- waits for system_on=1
-deferHandlers.Idle = 
-			{name = "Idle", 
+deferHandlers.Idle =
+			{name = "Idle",
 				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.sys_on}}
 			}
@@ -195,15 +247,15 @@ deferHandlers.Idle.handlerF = function (dH, Handler, EventT)
 end
 
 -- waits for system_on=0, places system into recovery mode
-deferHandlers.Running = 
-			{name = "Running", 
+deferHandlers.Running =
+			{name = "Running",
 				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.sys_on}}
 			}
 
 -- system shutdown, waits for carts to return to parked states, how to detect this in steady state?
-deferHandlers.Recovery = 
-			{name = "Recovery", 
+deferHandlers.Recovery =
+			{name = "Recovery",
 				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.sys_on}}
 			}
@@ -213,19 +265,19 @@ deferHandlers.Recovery.handlerF = function (dH, Handler, EventT)
 	-- sys_on=0 received
 	print("System turning off, recovery mode activated")
 	-- make sure mine switch track is clear
-	rsbClrOutput(rsb1.side, rsb1.m.sw_mine)
-	
+	rsbClrOutput(rsbOut1.side, rsbOut1.m.sw_mine)
+
 	-- remove all handlers
 	for HdlKey, Hdlr in pairs(dH.queue) do
 		deferHandle.remove(dH, Hdlr)
 	end
-		
+
 	deferHandle.add(dH, deferHandlers.Recovery_Pend)
 end
 
 -- system shutdown, waits for carts to return to parked states, how to detect this in steady state?
-deferHandlers.Recovery_Pend = 
-			{name = "Recovery_Pend", 
+deferHandlers.Recovery_Pend =
+			{name = "Recovery_Pend",
 				events={Event.Redstone, Event.Check_Recovery},
 				masks={{en=true,param=rsbIn1.mine_park, rsbIn1.derailer_park}}
 			}
@@ -233,106 +285,107 @@ deferHandlers.Recovery_Pend.handlerF = function (dH, Handler, EventT)
 	deferHandle.clearevent(EventT)
 
 	-- recovery pending
-	-- make sure mine switch track is clear
-		
+	local rsbInputs = rsbGetInputRaw(rsbIn1.side)
+--	if rxbInputs == bits.band(
+
 	deferHandle.add(dH, deferHandlers.Recovery_Pend)
 end
 
 
 -- cycles miner through fueling/resupply stations
-deferHandlers.Start_loadMiner = 
-			{name = "Start_loadMiner", 
-				events={__Redstone},
+deferHandlers.Start_loadMiner =
+			{name = "Start_loadMiner",
+				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.sys_on}}
 			}
 
 -- cycles derailer through fueling station
-deferHandlers.Start_loadDerailer = 
-			{name = "Start_loadDerailer", 
-				events={__Redstone},
+deferHandlers.Start_loadDerailer =
+			{name = "Start_loadDerailer",
+				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.sys_on}}
 			}
-			
+
 -- checks departure state and sets outbound or turns cart back
-deferHandlers.Send_Miner = 
-			{name = "Send_Miner", 
-				events={__Redstone},
+deferHandlers.Send_Miner =
+			{name = "Send_Miner",
+				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.depart_stateok+rsbIn1.m.departure}}
 			}
-			
+
 -- resets outbound switch track
-deferHandlers.Outbound = 
-			{name = "Outbound", 
-				events={__Redstone},
+deferHandlers.Outbound =
+			{name = "Outbound",
+				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.outbound}}
 			}
 
 -- waits for mining cart to return
-deferHandlers.Mining = 
-			{name = "Mining", 
-				events={__Redstone},
+deferHandlers.Mining =
+			{name = "Mining",
+				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.outbound}}
 			}
 
 -- puts into Miner scan
-deferHandlers.Arrival_Miner_Cart = 
-			{name = "Arrival_Cart", 
-				events={__Redstone},
+deferHandlers.Arrival_Miner_Cart =
+			{name = "Arrival_Cart",
+				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.arrival}}
 			}
-			
+
 -- check the cart scan, send the derailer or.... mine again
-deferHandlers.Arrival_Miner_Scan = 
-			{name = "Arrival_Miner_Scan", 
-				events={__Redstone},
+deferHandlers.Arrival_Miner_Scan =
+			{name = "Arrival_Miner_Scan",
+				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.read_done+rsbIn1.m.s5_torches+
 						rsbIn1.m.s3_cargo2+rsbIn1.m.s6_bridge+rsbIn1.m.s2_cargo1+
 						rsbIn1.m.s4_rails+rsbIn1.m.s1_carttype}}
 			}
-			
+
 -- puts into Derailer scan
-deferHandlers.Arrival_Miner_Cart = 
-			{name = "Arrival_Cart", 
-				events={__Redstone},
+deferHandlers.Arrival_Miner_Cart =
+			{name = "Arrival_Cart",
+				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.arrival}}
 			}
-			
+
 -- check the cart scan, send the miner
-deferHandlers.Arrival_Derailer_Scan = 
-			{name = "Arrival_Miner_Scan", 
-				events={__Redstone},
+deferHandlers.Arrival_Derailer_Scan =
+			{name = "Arrival_Miner_Scan",
+				events={Event.Redstone},
 				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.read_done+rsbIn1.m.s5_torches+
 						rsbIn1.m.s3_cargo2+rsbIn1.m.s6_bridge+rsbIn1.m.s2_cargo1+
 						rsbIn1.m.s4_rails+rsbIn1.m.s1_carttype}}
 			}
-			
+
 -- Unload the cargo Manager, 'push' event
-deferHandlers.Unload = 
-			{name = "Unload", 
+deferHandlers.Unload =
+			{name = "Unload",
 				handlerF = nil,
 				events={},
 				masks={}
 			}
 
 -- Reload the fuel depot, 'push' event
-deferHandlers.FuelResupply = 
-			{name = "FuelResupply", 
+deferHandlers.FuelResupply =
+			{name = "FuelResupply",
 				handlerF = nil,
 				events={},
 				masks={}
 			}
 
 -- Reload the torch depot, 'push' event
-deferHandlers.TorchResupply = 
-			{name = "TorchResupply", 
+deferHandlers.TorchResupply =
+			{name = "TorchResupply",
 				handlerF = nil,
 				events={},
 				masks={}
 			}
 
 -- Reload the bridge depot, 'push' event
-deferHandlers.BridgeResupply = 
-			{name = "BridgeResupply", 
+deferHandlers.BridgeResupply =
+			{name = "BridgeResupply",
 				handlerF = nil,
 				events={},
 				masks={}
@@ -373,8 +426,8 @@ function checkInputs()
 	for color,code in pairs(rsbInputs) do
 		if colorTest(test, code) then
 			print(color," is ON")
-		end	
-	end	
+		end
+	end
 	print("End input test")
 end
 
@@ -387,7 +440,7 @@ function resetCart()
 	Cart.hasBridge = __false
 end
 
-function Init()	
+function Init()
 	resetCart()
 	menuShow()
 	--myTimer = os.startTimer(1)
@@ -421,11 +474,11 @@ function processCart()
 	if(Cart.cartType == __miner) then
 		-- change the park switch track --
 		rsbSetOutput(rsbOutputs.sw_cartpark)
-		
+
 		-- set the downhill switch track --
-		
-		
-	end		
+
+
+	end
 
 end
 
@@ -457,19 +510,20 @@ end
 function main()
 
 	print("OreMiner v0.1a")
-	
+
 	local dH = deferHandle.init()
-	
-	deferHandle.setMaskHandler(dH, rsbMaskHandleF, __Redstone)
+	local rsb = Rsb.Ctx_init()
+
+	deferHandle.setMaskHandler(dH, rsbMaskHandleF, Event.redstone)
 	rsbStatusInit(deferHandlers)
-	
+
 	deferHandle.add(dH, deferHandlers.Init)
 
 	while true do
 		event, param1, param2, param3, param4 = os.pullEvent()
 		deferHandle.handle(dH, deferHandle.newevent(event, param1, param2, param3, param4))
 	end
-	
+
 end
 
 main()
@@ -509,7 +563,7 @@ while true do
 	end
 	if event == "redstone" then
 		input = redstone.getBundledInput(__rsbSideIn)
-		
+
 		if colorTest(input, rsbInputs.arrival) then
 			print("Cart Arrival!")
 			resetCart()
@@ -550,10 +604,10 @@ while true do
 			departState = true
 	--		Cart.hasBridge = __true
 		end
-		
-		
-	end	
-	
+
+
+	end
+
 	if event == "timer" then
 		os.startTimer(1)
 		if colorTest(input, rsbInputs.sys_on) then
