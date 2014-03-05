@@ -33,6 +33,7 @@ if type(os.loadAPI) == 'nil' then
 	os.queueEvent = _queueEvent
 
 	Rsb = require 'sysRsb'
+	ConfFile = require 'utilConfFile'
 
 end
 
@@ -119,7 +120,10 @@ function rsbGetInputRaw(side)
 end
 
 function rsbGetOutputRaw(side)
-	return Rsb.get()
+--	local rsbCtx = rSB.Ctx_get()
+	--for key, ctx in pairs(rsbCtx) do
+
+	--return W
 end
 
 function rsbSetOutputRaw(side, val)
@@ -507,12 +511,29 @@ function rsbMaskHandleF(maskE)
 	return maskcheck ~= 0
 end
 
+function getDefaultParams(params)
+
+params['RsbInputSide'] = "down"
+
+end
+
 function main()
 
 	print("OreMiner v0.1a")
 
 	local dH = deferHandle.init()
 	local rsb = Rsb.Ctx_init()
+	local params = {}
+	ConfFile.get("cfg.txt", params)
+	if not next(params) then
+		print("No config file found. Getting defaults\n")
+		getDefaultParams(params)
+		ConfFile.set("cfg.txt", params)
+	end
+
+	for k,v in pairs(params) do
+		print(k,v,"\n")
+	end
 
 	deferHandle.setMaskHandler(dH, rsbMaskHandleF, Event.redstone)
 	rsbStatusInit(deferHandlers)
