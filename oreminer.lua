@@ -37,6 +37,7 @@ if type(os.loadAPI) == 'nil' then
 
 end
 
+local RsbCtx = {}
 
 --[[
 local _TB_RSB_INPUT_VAL = 0
@@ -98,22 +99,57 @@ local Cart = {
 local deferHandlers = {}
 
 local colors = {side=nil,
-				m={white=1,orange=2,magenta=4,lightblue=8,
-	  		       yellow=16,lime=32,pink=64,gray=128,
-			 	   lightgray=256,cyan=512,purple=1024,blue=2048,
-		  		   brown=4096,green=8192,red=16384, black=32768}}
+				m={	white=1,orange=2,magenta=4,lightblue=8,
+					yellow=16,lime=32,pink=64,gray=128,
+					lightgray=256,cyan=512,purple=1024,blue=2048,
+					brown=4096,green=8192,red=16384, black=32768}}
 
-local rsbIn1 = {side="left",
-				m={read_done=1,sys_test=2,sys_on=4,s5_torches=8,
-		 		   s3_cargo2=16,lime=32, s6_bridge=64,miner_park=128,
-		 	   	   derailer_park=256,depart_stateok=512,departure=1024,s2_cargo1=2048,
-		 	   	   s4_rails=4096,arrival=8192,s1_carttype=16384, downhill=32768}}
+local rsbIn1 = {side=nil,
+				m={	sys_on=0,sys_test=0,
+					s_EntryExit=0,s_CartTypeMiner=0,s_CartTypeDerail=0,s_CartTypeUtil=0,
+					s_cargoNotFull=0, s_CargoEmpty=0, s_NoRails=0, s_ScanDone=0 }}
 
-local rsbOut1 = {side="right",
-				m={rs_general=1,send_derailer=2,sys_test=4,unload=8,
-		  	   	   sw_cartpark=16,lime=32,sys_fault=64,gray=128,
-		  	   	   lightgray=256,rs_fuel=512,send_miner=1024,rs_rails=2048,
-		           sensor_reset=4096,sys_running=8192,sw_mine=16384, sys_stop=32768}}
+local rsbOut1 = {side=nil,
+				m={	TrkSw_Mine=0,TrkSw_CartUtil=0,TrkSw_CartDerail=0,
+					Park_CartMiner=0,Park_CartDerail=0,Park_CartUtil=0,
+					Ind_Alarm=0,Ind_SysOn=0,Ind_SysTest=0}}
+
+local rsInputs = {}
+local rsOutputs = {}
+local rsInputNames = {	"sys_on","sys_test",
+					"s_EntryExit","s_CartTypeMiner","s_CartTypeDerail","s_CartTypeUtil",
+					"s_cargoNotFull", "s_CargoEmpty", "s_NoRails", "s_ScanDone" }
+
+local rsOutputNames = {"TrkSw_Mine","TrkSw_CartUtil","TrkSw_CartDerail",
+					"Park_CartMiner","Park_CartDerail","Park_CartUtil",
+					"Ind_Alarm","Ind_SysOn","Ind_SysTest" }
+
+function rsInit()
+	for x,Name in pairs(rsInputNames) do
+		rsInputs[Name] = 0
+	end
+	for x,Name in pairs(rsOutputNames) do
+		rsOutputs[Name] = 0
+	end
+end
+
+function rsSetup(params)
+	for x,Name in pairs(rsInputNames) do
+		rsInputs[Name] = params[Name]
+	end
+	for x,Name in pairs(rsOutputNames) do
+		rsOutputs[Name] = params[Name]
+	end
+end
+
+function rsParamsSetup(params)
+	for x,Name in pairs(rsInputNames) do
+		params[Name] = rsInputs[Name]
+	end
+	for x,Name in pairs(rsOutputNames) do
+		params[Name] = rsOutputs[Name]
+	end
+end
 
 function rsbGetInputRaw(side)
 	return  Rsb.Ctx_getBundledInput(side)
@@ -207,29 +243,26 @@ deferHandlers.Init.handlerF = function (dH, Handler, EventT)
 	deferHandle.clearevent(EventT)
 	--rsbSetOutputRaw(rsbOut1.side, 0)
 
-	local rsbOutputs = rsbGetOutputRaw(rsbOut1.side)
-	if rsbOutputs ~= 0 then
-		print("ERROR-Unable to clear outputs! System cannot start")
-		return
+	rsbCtx = Rsb.Ctx_get(RsbCtx)
+	for side,v in pairs(rsbCtx) do
+		if rsbCtx[side].valOutput ~= 0 then
+			print("ERROR-Unable to clear outputs! System cannot start:",side,";",v)
+			return
+		end
+		if rsbCtx[side].valInputs ~= 0 then
+			print("ERROR-Input active, please reset before system can start:",side,";",v)
+			return
+		end
 	end
 
-	local rsbInputs = rsbGetInputRaw(rsbIn1.side)
-	if rsbInputs ~= 0 then
-		print("ERROR-Input active, please reset before system can start")
-		for input, val in ipairs(rsbIn1.m) do
-			if bit.band(rsbInputs, val) then
-				print(input)
-			end
-		end
-		print("Press any key to continue")
-	else
-		print("I/O checks PASSED, starting system")
-		Init()
-		deferHandle.remove(dH, Handler)
-		deferHandle.add(dH, deferHandlers.Idle)
-		deferHandle.add(dH, deferHandlers.UI)
-		QueueNewEvent(Event.Push)
-	end
+
+	print("Press any key to continue")
+	print("I/O checks PASSED, starting system")
+	Init()
+	deferHandle.remove(dH, Handler)
+	deferHandle.add(dH, deferHandlers.Idle)
+	deferHandle.add(dH, deferHandlers.UI)
+	QueueNewEvent(Event.Push)
 end
 
 
@@ -314,37 +347,37 @@ deferHandlers.Start_loadDerailer =
 deferHandlers.Send_Miner =
 			{name = "Send_Miner",
 				events={Event.Redstone},
-				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.depart_stateok+rsbIn1.m.departure}}
+				masks={{en=true,param=rsbIn1.side,mask=0}}
 			}
 
 -- resets outbound switch track
 deferHandlers.Outbound =
 			{name = "Outbound",
 				events={Event.Redstone},
-				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.outbound}}
+				masks={{en=true,param=rsbIn1.side,mask=0}}
 			}
 
 -- waits for mining cart to return
 deferHandlers.Mining =
 			{name = "Mining",
 				events={Event.Redstone},
-				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.outbound}}
+				masks={{en=true,param=rsbIn1.side,mask=0}}
 			}
 
 -- puts into Miner scan
 deferHandlers.Arrival_Miner_Cart =
 			{name = "Arrival_Cart",
 				events={Event.Redstone},
-				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.arrival}}
+				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.EntryExit}}
 			}
 
 -- check the cart scan, send the derailer or.... mine again
 deferHandlers.Arrival_Miner_Scan =
 			{name = "Arrival_Miner_Scan",
 				events={Event.Redstone},
-				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.read_done+rsbIn1.m.s5_torches+
-						rsbIn1.m.s3_cargo2+rsbIn1.m.s6_bridge+rsbIn1.m.s2_cargo1+
-						rsbIn1.m.s4_rails+rsbIn1.m.s1_carttype}}
+				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.s_ScanDone+
+						rsbIn1.m.s_CargoEmpty+rsbIn1.m.s_cargoNotFull+rsbIn1.m.s_NoRails+
+						rsbIn1.m.s_CartTypeMiner+rsbIn1.m.s_CartTypeDerail}}
 			}
 
 -- puts into Derailer scan
@@ -358,9 +391,9 @@ deferHandlers.Arrival_Miner_Cart =
 deferHandlers.Arrival_Derailer_Scan =
 			{name = "Arrival_Miner_Scan",
 				events={Event.Redstone},
-				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.read_done+rsbIn1.m.s5_torches+
-						rsbIn1.m.s3_cargo2+rsbIn1.m.s6_bridge+rsbIn1.m.s2_cargo1+
-						rsbIn1.m.s4_rails+rsbIn1.m.s1_carttype}}
+				masks={{en=true,param=rsbIn1.side,mask=rsbIn1.m.s_ScanDone+
+						rsbIn1.m.s_CargoEmpty+rsbIn1.m.s_cargoNotFull+rsbIn1.m.s_NoRails+
+						rsbIn1.m.s_CartTypeMiner+rsbIn1.m.s_CartTypeDerail}}
 			}
 
 -- Unload the cargo Manager, 'push' event
@@ -513,7 +546,7 @@ end
 
 function getDefaultParams(params)
 
-params['RsbInputSide'] = "down"
+	rsParamsSetup(params)
 
 end
 
@@ -521,18 +554,20 @@ function main()
 
 	print("OreMiner v0.1a")
 
+
 	local dH = deferHandle.init()
-	local rsb = Rsb.Ctx_init()
+	RsbCtx = Rsb.Ctx_init()
 	local params = {}
+	rsInit()
 	ConfFile.get("cfg.txt", params)
-	if not next(params) then
+	if next(params) == nil then
 		print("No config file found. Getting defaults\n")
 		getDefaultParams(params)
 		ConfFile.set("cfg.txt", params)
 	end
 
 	for k,v in pairs(params) do
-		print(k,v,"\n")
+		print(k,v)
 	end
 
 	deferHandle.setMaskHandler(dH, rsbMaskHandleF, Event.redstone)
