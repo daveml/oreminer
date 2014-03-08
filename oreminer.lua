@@ -39,6 +39,7 @@ end
 
 local RsbCtx = {}
 
+
 --[[
 local _TB_RSB_INPUT_VAL = 0
 local _TB_RSB_OUTPUT_VAL = 0
@@ -243,13 +244,14 @@ deferHandlers.Init.handlerF = function (dH, Handler, EventT)
 	deferHandle.clearevent(EventT)
 	--rsbSetOutputRaw(rsbOut1.side, 0)
 
-	rsbCtx = Rsb.Ctx_get(RsbCtx)
-	for side,v in pairs(rsbCtx) do
-		if rsbCtx[side].valOutput ~= 0 then
+	rsbCtx = RsbCtx.State_get()
+
+	for idx, Side in pairs(rsbCtx) do
+		if Side:Output_get() ~= 0 then
 			print("ERROR-Unable to clear outputs! System cannot start:",side,";",v)
 			return
 		end
-		if rsbCtx[side].valInputs ~= 0 then
+		if Side:Input_get() ~= 0 then
 			print("ERROR-Input active, please reset before system can start:",side,";",v)
 			return
 		end
@@ -556,7 +558,7 @@ function main()
 
 
 	local dH = deferHandle.init()
-	RsbCtx = Rsb.Ctx_init()
+	RsbCtx = Rsb.init()
 	local params = {}
 	rsInit()
 	ConfFile.get("cfg.txt", params)
